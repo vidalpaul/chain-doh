@@ -1,6 +1,6 @@
 there are no global broadcast channels on Corda, so one must specify the recipients of each message
 
-Cord nodes dicover each other via a Network Map service which publishes a list of peer nodes, containing metadata about who they are and what services they can offer
+Corda nodes dicover each other via a Network Map service which publishes a list of peer nodes, containing metadata about who they are and what services they can offer
 
 each nodes maintains a vault containing all of its known facts
 the vault is a SQL db
