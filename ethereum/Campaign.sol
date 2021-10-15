@@ -1,6 +1,14 @@
 pragma solidity ^0.4.17;
 
 contract Campaign {
+    struct Request {
+        string description;
+        uint value;
+        address recipient;
+        bool complete;
+    }
+    
+    
     address public manager;
     uint public minimumContribution;
     address[] public approvers;
@@ -18,7 +26,7 @@ contract Campaign {
     
     function createRequest() restricted {}
     
-    function approveRequest() {}
+    // function approveRequest() contributor {}
     
     function finalizeRequest() restricted {}
     
@@ -26,5 +34,10 @@ contract Campaign {
         require(msg.sender == manager);
         _;
     }
+    
+    // modifier contributor() {
+    //     require(msg.sender in approvers);
+    //     _;
+    // }
 
 }
