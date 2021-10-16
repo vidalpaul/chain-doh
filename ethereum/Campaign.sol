@@ -7,6 +7,7 @@ contract Campaign {
         address recipient;
         bool complete;
         uint approvalCount;
+        mapping(address => bool) voters;
     }
     
     address public manager;
@@ -18,12 +19,7 @@ contract Campaign {
         require(msg.sender == manager);
         _;
     }
-    
-    modifier contributor() {
-        require(approvers[msg.sender]);
-        _;
-    }
-    
+   
     function Campaign(uint minimum) public {
         manager = msg.sender;
         minimumContribution = minimum;
@@ -48,11 +44,14 @@ contract Campaign {
         requests.push(newRequest);
     }
     
-    function approveRequest() contributor {
-        
+    function approveRequest(uint idx) public {
+        require(approvers[msg.sender]);
+        require(!requests[idx].voters[msg.sender]);
+        requests[idx].approvalCount++;
+        requests[idx].voters[msg.sender] = true;
     }
     
-    function finalizeRequest() public restricted {
-        
+    function finalizeRequest(uint idx) public restricted {
+        requests[idx].complete = true;
     }
 }
