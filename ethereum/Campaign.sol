@@ -24,7 +24,18 @@ contract Campaign {
         approvers.push(msg.sender);
     }
     
-    function createRequest() restricted {}
+    function createRequest(string description, uint value, address recipient) public restricted {
+        Request memory newRequest = Request({
+           description: description,
+           value: value,
+           recipient: recipient,
+           complete: false
+        });
+        
+        // a worse way of doing it: Request(description, value, recipient, false);
+        
+        requests.push(newRequest);
+    }
     
     // function approveRequest() contributor {}
     
