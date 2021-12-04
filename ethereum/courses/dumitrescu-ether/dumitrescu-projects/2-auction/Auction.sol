@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 contract Auction {
     address payable public owner;
-    address payable highestBidder;
+    address payable public highestBidder;
     uint public startBlock;
     uint public endBlock;
     uint public bidIncrement;
@@ -56,6 +56,23 @@ contract Auction {
 
     }
 
+    //     function placeBid() public payable notOwner afterStart beforeEnd {
+    //     require(auctionState == State.Running);
+    //     require(msg.value >= 100);
+    //     uint currentBid = bids[msg.sender] + msg.value;
+    //     bids[msg.sender] = currentBid;
+    //     if(currentBid > highestBindingBid){
+    //         if(currentBid <= bids[highestBidder]){
+    //             highestBindingBid = min(currentBid + bidIncrement, bids[highestBidder]);
+    //         } else {
+    //             highestBindingBid = min(currentBid, bids[highestBidder] + bidIncrement);
+    //             highestBidder = payable(msg.sender);
+    //         }
+    //     }
+
+    // }
+
+
     function placeBid() public payable notOwner afterStart beforeEnd {
         require(auctionState == State.Running);
         require(msg.value >= 100);
@@ -69,4 +86,40 @@ contract Auction {
             highestBidder = payable(msg.sender);
         }
     }
+
+    // function cancelAuction() public payable onlyOwner {
+    //     require(auctionState == State.Running);
+    //     auctionState = State.Cancelled;
+    // }
+
+    function finalizeAuction() public payable onlyOwner {
+        require(auctionState == State.Cancelled || block.number > endBlock);
+        require(msg.sender == owner || bids[msg.sender] > 0);
+        address payable recipient;
+        uint value;
+
+        if(auctionState == State.Cancelled){
+            recipient = payable(msg.sender);
+            value = bids[msg.sender];
+        } else { // if auction ended
+            if(msg.sender == owner){ // this is the owner
+                recipient = owner;
+                value = highestBindingBid;
+            } else { // this is a bidder
+                if(msg.sender == highestBidder) {
+                    recipient = highestBidder;
+                    value = bids[highestBidder] - highestBindingBid;
+                } else { // this is neither the owner nor the highestBidder
+                    recipient = payable(msg.sender);
+                    value = bids[msg.sender];
+                    }
+                }
+        }
+
+        recipient.transfer(value);
+    }
+
+    // function withdrawal() public payable {
+    //     require(auctionState == State.Cancelled);
+    // }
 }
