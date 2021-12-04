@@ -2,6 +2,14 @@
 
 pragma solidity ^0.8.0;
 
+contract AuctionCreator {
+    Auction[] public deployedAuctions;
+    function deploy() public {
+        Auction new_auction = new Auction(msg.sender);
+        deployedAuctions.push(new_auction);
+    }
+}
+
 contract Auction {
     address payable public owner;
     address payable public highestBidder;
@@ -17,14 +25,14 @@ contract Auction {
     State public auctionState;
 
 
-    constructor() {
-        owner = payable(msg.sender);
+    constructor(address eoa) {
+        owner = payable(eoa);
         auctionState = State.Running;
         startBlock = block.number;
         // auction will run for a week
-        endBlock = startBlock + 40320;
+        endBlock = startBlock + 4;
         ipfsHash = "";
-        bidIncrement = 100;
+        bidIncrement = 1000000000000000000;
     }
 
     modifier onlyOwner() {
@@ -87,12 +95,12 @@ contract Auction {
         }
     }
 
-    // function cancelAuction() public payable onlyOwner {
-    //     require(auctionState == State.Running);
-    //     auctionState = State.Cancelled;
-    // }
+    function cancelAuction() public payable onlyOwner {
+        require(auctionState == State.Running);
+        auctionState = State.Cancelled;
+    }
 
-    function finalizeAuction() public payable onlyOwner {
+    function finalizeAuction() public payable {
         require(auctionState == State.Cancelled || block.number > endBlock);
         require(msg.sender == owner || bids[msg.sender] > 0);
         address payable recipient;
@@ -115,11 +123,12 @@ contract Auction {
                     }
                 }
         }
-
+        // exclude recipient from bids mapping
+        bids[recipient] = 0;
         recipient.transfer(value);
     }
 
-    // function withdrawal() public payable {
-    //     require(auctionState == State.Cancelled);
-    // }
+    function withdrawal() public payable {
+        require(auctionState == State.Cancelled);
+    }
 }
