@@ -31,4 +31,20 @@ contract Campaign {
         require(msg.sender == admin);
         _;
     }
+
+    function contribute() public payable {
+        require(block.timestamp < deadline, "Deadline has passed");
+        require(msg.value >= minimumContribution, "Minimum contribution not met");
+        if(contributors[msg.sender] == 0){
+            nOfContributors++;
+        }
+        contributors[msg.sender] += msg.value;
+        raisedAmount += msg.value;
+    }
+
+    receive() payable external {
+        contribute();
+    }
+
+    
 }
