@@ -28,7 +28,7 @@ contract Campaign {
         uint nOfVoters;
         mapping(address => bool) voters;
     }
-    mapping(uint => Request) requests;
+    mapping(uint => Request) public requests;
 
     constructor(uint _goal, uint _deadline){
         // admin = payable(eoa);
