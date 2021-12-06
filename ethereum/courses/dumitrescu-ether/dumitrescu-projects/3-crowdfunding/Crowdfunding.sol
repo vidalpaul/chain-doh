@@ -80,4 +80,12 @@ contract Campaign {
         nOfRequests++;
     }
 
+    function voteForRequest(uint _requestNo) public {
+        require(contributors[msg.sender] > 0, "You must be a contributor to vote");
+        Request storage thisRequest = requests[_requestNo];
+        require(thisRequest.voters[msg.sender] == false, "You have already voted");
+        thisRequest.voters[msg.sender] = true;
+        thisRequest.nOfVoters++;
+    }
+
 }
