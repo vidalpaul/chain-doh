@@ -88,4 +88,11 @@ contract Campaign {
         thisRequest.nOfVoters++;
     }
 
-}
+    function makePayment(uint _requestNo) public onlyAdmin {
+        require(raisedAmount >= goal);
+        Request storage thisRequest = requests[_requestNo];
+        require(thisRequest.completed == false, "The request is already completed");
+        require(thisRequest.nOfVoters > nOfContributors / 2);
+        thisRequest.recipient.transfer(thisRequest.value);
+        thisRequest.completed = true;
+    }
