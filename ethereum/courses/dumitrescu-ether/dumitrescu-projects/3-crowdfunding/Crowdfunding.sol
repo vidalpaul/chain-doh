@@ -38,6 +38,12 @@ contract Campaign {
         minimumContribution = 100 wei;
     }
 
+    event ContributeEvent(address _sender, uint _value);
+
+    event CreateRequestEvent(string _description, address _recipient, uint _value);
+
+    event MakePaymentEvent(address _recipient, uint _value);
+
     modifier onlyAdmin() {
         require(msg.sender == admin);
         _;
@@ -51,6 +57,8 @@ contract Campaign {
         }
         contributors[msg.sender] += msg.value;
         raisedAmount += msg.value;
+
+        emit ContributeEvent(msg.sender, msg.value);
     }
 
     receive() payable external {
@@ -78,6 +86,8 @@ contract Campaign {
         newRequest.completed = false;
         newRequest.nOfVoters = 0;
         nOfRequests++;
+
+        emit CreateRequestEvent(_description, _recipient, _value);
     }
 
     function voteForRequest(uint _requestNo) public {
@@ -95,4 +105,7 @@ contract Campaign {
         require(thisRequest.nOfVoters > nOfContributors / 2);
         thisRequest.recipient.transfer(thisRequest.value);
         thisRequest.completed = true;
+
+        emit MakePaymentEvent(thisRequest.recipient, thisRequest.value);
     }
+}
