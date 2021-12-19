@@ -25,4 +25,33 @@ contract ChihuahaICO is Chihuahua {
         admin = msg.sender;
         ICOState = State.beforeStart;
     }
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin);
+        _;
+    }
+
+    function halt() public onlyAdmin {
+        ICOState = State.halted;
+    }
+
+    function resume() public onlyAdmin {
+        ICOState = State.running;
+    }
+
+    function changeDepositAddress(address payable newDeposit) public onlyAdmin {
+        deposit = newDeposit;
+    }
+
+    function getCurrentState() public view returns (State) {
+        if(ICOState == State.halted){
+            return State.halted;
+        } else if(block.timestamp < saleStart){
+            return State.beforeStart;
+        } else if(block.timestamp <= saleEnd){
+            return State.running;
+        } else {
+            return State.afterEnd;
+        }
+    }
 }
