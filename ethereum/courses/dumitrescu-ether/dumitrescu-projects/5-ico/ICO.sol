@@ -76,4 +76,16 @@ contract ChihuahaICO is Chihuahua {
     receive() payable external {
         invest();
     }
+
+    function transfer(address to, uint tokens) public override returns (bool success) {
+        require(block.timestamp > tokenTradeStart);
+        Chihuahua.transfer(to, tokens); // or super.transfer(to, tokens)
+        return true;
+    }
+
+    function transferFrom(address from, address to, uint tokens) public override returns (bool success){
+        require(block.timestamp > tokenTradeStart);
+        Chihuahua.transferFrom(from, to, tokens); // or super.transferFrom(from, to, tokens)
+        return true;
+    }
 }
