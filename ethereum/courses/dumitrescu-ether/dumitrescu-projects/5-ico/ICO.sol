@@ -9,7 +9,7 @@ contract ChihuahaICO is Chihuahua {
     // it is safer than storing the Ether in the contract
     address payable public deposit;
     uint public tokenPrice = 0.001 ether; // 1 ETH = 1000 CHI
-    uint public hardcap = 300 ether;
+    uint public hardCap = 300 ether;
     uint public raisedAmount; // this value will be in wei
     uint public saleStart = block.timestamp;
     uint public saleEnd = block.timestamp +  604800; // sale ends in one week
@@ -31,6 +31,7 @@ contract ChihuahaICO is Chihuahua {
         _;
     }
 
+    // Start emergency administrative functions
     function halt() public onlyAdmin {
         ICOState = State.halted;
     }
@@ -53,5 +54,26 @@ contract ChihuahaICO is Chihuahua {
         } else {
             return State.afterEnd;
         }
+    }
+    // End of emergency functions
+
+    event Invest(address investor, uint value, uint tokens);
+
+    function invest() payable public returns (bool){
+        ICOState = getCurrentState();
+        require(ICOState == State.running);
+        require(msg.value <= maxInvestment && msg.value >= minInvestment);
+        raisedAmount += msg.value;
+        require(raisedAmount <= hardCap);
+        uint tokens = msg.value / tokenPrice;
+        balances[msg.sender] += tokens;
+        balances[founder] -= tokens;
+        deposit.transfer(msg.value);
+        emit Invest(msg.sender, msg.value, tokens);
+        return true;
+    }
+
+    receive() payable external {
+        invest();
     }
 }
