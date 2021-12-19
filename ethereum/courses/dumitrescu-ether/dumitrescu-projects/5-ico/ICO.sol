@@ -88,4 +88,11 @@ contract ChihuahaICO is Chihuahua {
         Chihuahua.transferFrom(from, to, tokens); // or super.transferFrom(from, to, tokens)
         return true;
     }
+
+    function burn() public returns (bool){
+        ICOState = getCurrentState();
+        require(ICOState == State.afterEnd);
+        balances[founder] = 0;
+        return true;
+    }
 }
